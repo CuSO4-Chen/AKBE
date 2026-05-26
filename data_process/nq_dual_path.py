@@ -164,8 +164,20 @@ def make_prefix(dp, template_type):
     # NOTE: also need to change reward_score/countdown.py
     if template_type == 'base':
         """This works for any base model"""
-        #prefix = f"""You are a helpful assistant that can solve the given question step by step with the help of the wikipedia search tool and python interpreter tool. Given a question, you need to first think about the reasoning process in the mind and then provide the answer. During thinking, you can invoke the wikipedia search tool to search and python interpreter tool to calculate the math problem for fact information about specific topics if needed. The reasoning process and answer are enclosed within <think> </think> and <answer> </answer> tags respectively, and the search query and result are enclosed within <search> </search> and <result> </result> tags respectively. For example, <think> This is the reasoning process. </think> <search> search query here </search> <result> search result here </result> <think> This is the reasoning process. </think> <python> python code here </python> <result> python interpreter result here </result> <think> This is the reasoning process. </think> <answer> The final answer is \\[ \boxed{{answer here}} \\] </answer>. In the last part of the answer, the final exact answer is enclosed within \boxed{{}} with latex format.\nuser\n{question}"""
-        prefix = f"""You are a helpful assistant that can solve the given question step by step with the help of the wikipedia search tool. Given a question, you need to first think about the reasoning process in the mind and then provide the answer. During thinking, you can invoke the wikipedia search tool to search for fact information about specific topics if needed. You can search as many times as your want. The reasoning process and answer are enclosed within <think> </think> and <answer> </answer> tags respectively, and the search query and result are enclosed within <search> </search> and <result> </result> tags respectively. For example, <think> This is the reasoning process. </think> <search> search query here </search> <result> search result here </result>  <think> This is the reasoning process. </think> <answer> The final answer is \\[ \boxed{{answer here}} \\] </answer>. In the last part of the answer, the final exact answer is enclosed within \boxed{{}} with latex format.\nuser\n{question}"""
+        #prefix = f"""You are a helpful assistant that can solve the given question step by step with the help of the wikipedia search tool and python interpreter tool. Given a question, you need to first think about the reasoning process in the mind and then provide the answer. During thinking, you can invoke the wikipedia search tool to search and python interpreter tool to calculate the math problem for fact information about specific topics if needed. The reasoning process and answer are enclosed within <think> </think> and <answer> </answer> tags respectively, and the search query and result are enclosed within <search> </search> and <result> </result> tags respectively. For example, <think> This is the reasoning process. </think> <search> search query here </search> <result> search result here </result> <think> This is the reasoning process. </think> <python> python code here </python> <result> python interpreter result here </result> <think> This is the reasoning process. </think> <answer> The final answer is \\[ \boxed{{answer here}} \\] </answer>. In the last part of the answer, the final exact answer is enclosed within \boxed{{}} with latex format.\\nuser\\n{question}"""
+        prefix = f"""You are a helpful assistant that can solve the given question step by step with the help of the wikipedia search tool. Given a question, you need to first think about the reasoning process in the mind and then provide the answer. During thinking, you can invoke the wikipedia search tool to search for fact information about specific topics if needed. You can search as many times as your want. The reasoning process and answer are enclosed within <think> </think> and <answer> </answer> tags respectively, and the search query and result are enclosed within <search> </search> and <result> </result> tags respectively. For example, <think> This is the reasoning process. </think> <search> search query here </search> <result> search result here </result>  <think> This is the reasoning process. </think> <answer> The final answer is \\[ \boxed{{answer here}} \\] </answer>. In the last part of the answer, the final exact answer is enclosed within \boxed{{}} with latex format.\\nuser\\n{question}"""
+    else:
+        raise NotImplementedError
+    return prefix
+
+
+def make_no_tool_prefix(dp, template_type):
+    """Generate no-tool prompt (without tool instructions)"""
+    question = dp['question']
+
+    if template_type == 'base':
+        # No-tool version: same format but without any tool-related instructions
+        prefix = f"""You are a helpful assistant that can solve the given question step by step without external tool. Given a question, you need to first think about the reasoning process in the mind and then provide the answer. The reasoning process and answer are enclosed within <think> </think> and <answer> </answer> tags respectively. For example, <think> This is the reasoning process. </think> <answer> The final answer is \\[ \boxed{{answer here}} \\] </answer>. In the last part of the answer, the final exact answer is enclosed within \boxed{{}} with latex format.\nuser\n{question}"""
     else:
         raise NotImplementedError
     return prefix
@@ -173,7 +185,7 @@ def make_prefix(dp, template_type):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='../nq')
+    parser.add_argument('--local_dir', default='../nq_dual_path')
     parser.add_argument('--hdfs_dir', default=None)
     parser.add_argument('--template_type', type=str, default='base')
 
@@ -193,7 +205,12 @@ if __name__ == '__main__':
             example['question'] = example['question'].strip()
             if example['question'][-1] != '?':
                 example['question'] += '?'
-            question = make_prefix(example, template_type=args.template_type)
+            
+            # Generate with-tool prompt
+            question_with_tool = make_prefix(example, template_type=args.template_type)
+            
+            # Generate no-tool prompt
+            question_no_tool = make_no_tool_prefix(example, template_type=args.template_type)
             
             solution = {
                 "target": example['golden_answers'],
@@ -203,7 +220,11 @@ if __name__ == '__main__':
                 "data_source": data_source,
                 "prompt": [{
                     "role": "system",
-                    "content": question,
+                    "content": question_with_tool,  # With-tool prompt
+                }],
+                "prompt_no_tool": [{
+                    "role": "system",
+                    "content": question_no_tool,  # No-tool prompt (separate column)
                 }],
                 "ability": "fact-reasoning",
                 "reward_model": {
