@@ -31,7 +31,6 @@ Agentic reinforcement learning (RL) has proven effective for training LLM-based 
   </i>
 </p>
 
-*Evaluation on seven benchmarks shows consistent improvement against existing strongest baselines.*
 
 ## Quick Start
 
