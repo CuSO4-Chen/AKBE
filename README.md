@@ -1,11 +1,11 @@
-<h1 align="center" style="margin-top: 10px;">AT<sup>2</sup>PO: Agentic Turn-based Policy Optimization via Tree Search</h1>
+<h1 align="center" style="margin-top: 10px;">Efficient Agentic Reinforcement Learning with On-Policy Intrinsic Knowledge Boundary Enhancement</h1>
 
 
 
 <div align="center"> 
 
-[![Paper](https://img.shields.io/badge/Paper-arXiv-b5212f.svg?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2601.04767)
-[![Paper](https://img.shields.io/badge/Paper-Hugging%20Face-yellow?style=flat-square&logo=huggingface)](https://huggingface.co/papers/2601.04767)
+[![Paper](https://img.shields.io/badge/Paper-arXiv-b5212f.svg?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2605.26952)
+[![Paper](https://img.shields.io/badge/Paper-Hugging%20Face-yellow?style=flat-square&logo=huggingface)](https://huggingface.co/papers/2605.26952)
 <!-- [![](https://raw.githubusercontent.com/SwanHubX/assets/main/badge2.svg)](https://swanlab.cn/@yux1ang/Tree-GRPO/overview) -->
 
 </div>
@@ -108,5 +108,13 @@ We express our gratitude to these open-source projects.
 
 ## Citation
 ```bibtex
-
+@misc{chen2026efficientagenticreinforcementlearning,
+      title={Efficient Agentic Reinforcement Learning with On-Policy Intrinsic Knowledge Boundary Enhancement}, 
+      author={Dingwei Chen and Zefang Zong and Zhipeng Ma and Leo Luo and Yang Li and Chengming Li and Peng Chen and Jie Jiang},
+      year={2026},
+      eprint={2605.26952},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2605.26952}, 
+}
 ```
